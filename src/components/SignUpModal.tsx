@@ -2,12 +2,13 @@ import { motion, AnimatePresence } from "motion/react";
 import { X, Send, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { useState, FormEvent } from "react";
 
-// === Formspree ===
-// 1. Creá una cuenta gratis en https://formspree.io
-// 2. Creá un form y configurá press@ninchcompany.com como destino
-// 3. Pegá acá el ID que te dan (la parte final de https://formspree.io/f/XXXXXXXX)
-const FORMSPREE_FORM_ID = "xkoelqab";
-const FORMSPREE_ENDPOINT = `https://formspree.io/f/${FORMSPREE_FORM_ID}`;
+// === Google Apps Script (formulario → Google Sheets) ===
+// 1. Creá una hoja en Google Sheets.
+// 2. Extensiones → Apps Script, pegá el script que te pasamos.
+// 3. Implementar → Nueva implementación → Tipo: Aplicación web.
+//    Ejecutar como: Tú | Acceso: Cualquier usuario.
+// 4. Copiamos la URL que termina en /exec y pegala acá abajo.
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzdF4Rm5I52JInF6hdxdGmMZAmHzEE83ujAgPFNvTcvTwxwTA8g_19cvt0oh51WG6zJrQ/exec";
 
 interface SignUpModalProps {
   isOpen: boolean;
@@ -59,10 +60,10 @@ export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
     e.preventDefault();
     if (status === "sending") return;
 
-    // Aviso si todavía no se configuró el ID de Formspree
-    if (FORMSPREE_FORM_ID === "TU_FORM_ID_AQUI") {
+    // Aviso si todavía no se configuró la URL del Apps Script
+    if (APPS_SCRIPT_URL === "TU_URL_DE_APPS_SCRIPT_AQUI") {
       setStatus("error");
-      setErrorMsg("El formulario aún no está configurado. Falta el ID de Formspree.");
+      setErrorMsg("El formulario aún no está configurado. Falta la URL de Google Apps Script.");
       return;
     }
 
@@ -70,29 +71,25 @@ export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
     setErrorMsg("");
 
     try {
-      const response = await fetch(FORMSPREE_ENDPOINT, {
+      // Apps Script no devuelve headers CORS, por eso usamos no-cors.
+      // La respuesta queda "opaca" (no se puede leer), pero el dato sí se
+      // escribe en la hoja. Asumimos éxito si el fetch no lanza error de red.
+      await fetch(APPS_SCRIPT_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({
-          "Nombre completo": formData.fullName,
-          "País": formData.country,
-          "Fecha de nacimiento": formData.birthDate,
-          "Género": formData.gender,
-          "Email": formData.email,
-          "Teléfono": formData.phone,
-          "Usuario (IG/TikTok)": formData.handle,
-          "Tipo de contenido": formData.contentTypes.join(", "),
+          fullName: formData.fullName,
+          country: formData.country,
+          birthDate: formData.birthDate,
+          gender: formData.gender,
+          email: formData.email,
+          phone: formData.phone,
+          handle: formData.handle,
+          contentTypes: formData.contentTypes.join(", "),
         }),
       });
-
-      if (response.ok) {
-        setStatus("success");
-      } else {
-        const data = await response.json().catch(() => null);
-        const msg = data?.errors?.map((er: { message: string }) => er.message).join(", ");
-        setStatus("error");
-        setErrorMsg(msg || "No se pudo enviar el formulario. Intentá de nuevo.");
-      }
+      setStatus("success");
     } catch {
       setStatus("error");
       setErrorMsg("Error de conexión. Revisá tu internet e intentá de nuevo.");

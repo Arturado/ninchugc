@@ -32,9 +32,8 @@ export const ChatBot = () => {
     scrollToBottom();
   }, [messages]);
 
-  // Selección de categoría desde el menú
+  // Selección de categoría desde el menú (solo navega, NO escribe en el chat)
   const handleSelectCategory = (category: Category) => {
-    setMessages(prev => [...prev, { role: 'user', text: category.label }]);
     setView({ type: 'questions', category });
   };
 
