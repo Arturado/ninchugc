@@ -2,11 +2,8 @@ import { motion, AnimatePresence } from "motion/react";
 import { X, Send, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { useState, FormEvent } from "react";
 
-// === Formspree ===
-// 1. Creá una cuenta gratis en https://formspree.io
-// 2. Creá un form y configurá press@ninchcompany.com como destino
-// 3. Pegá acá el ID que te dan (la parte final de https://formspree.io/f/XXXXXXXX)
-const FORMSPREE_FORM_ID = "TU_FORM_ID_AQUI";
+
+const FORMSPREE_FORM_ID = "xkoelqab";
 const FORMSPREE_ENDPOINT = `https://formspree.io/f/${FORMSPREE_FORM_ID}`;
 
 interface SignUpModalProps {
@@ -60,7 +57,7 @@ export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
     if (status === "sending") return;
 
     // Aviso si todavía no se configuró el ID de Formspree
-    if (FORMSPREE_FORM_ID === "TU_FORM_ID_AQUI") {
+    if (FORMSPREE_FORM_ID === "xkoelqab") {
       setStatus("error");
       setErrorMsg("El formulario aún no está configurado. Falta el ID de Formspree.");
       return;
