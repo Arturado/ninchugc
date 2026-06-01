@@ -1,20 +1,27 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { MessageCircle, X, Send, User, Bot, Loader2 } from "lucide-react";
-import { chatWithGemini } from "../lib/gemini";
+import { MessageCircle, X, Bot, ArrowLeft, Mail, ChevronRight } from "lucide-react";
+import { CATEGORIES, CONTACT_EMAIL, type Category, type QA } from "../lib/chatbotData";
 
 interface Message {
   role: 'user' | 'model';
   text: string;
 }
 
+// Vistas de navegación del chatbot
+type View =
+  | { type: 'menu' }
+  | { type: 'questions'; category: Category }
+  | { type: 'answer'; category: Category; qa: QA };
+
+const WELCOME = '¡Hola! Soy NINCH AI. Elegí una opción para empezar 👇';
+
 export const ChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [view, setView] = useState<View>({ type: 'menu' });
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'model', text: '¡Hola! Soy NINCH AI. ¿En qué puedo ayudarte hoy?' }
+    { role: 'model', text: WELCOME }
   ]);
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -23,38 +30,33 @@ export const ChatBot = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isLoading]);
+  }, [messages]);
 
-  const handleSend = async (text: string = input) => {
-    if (!text.trim() || isLoading) return;
-
-    const userMessage: Message = { role: 'user', text };
-    setMessages(prev => [...prev, userMessage]);
-    setInput('');
-    setIsLoading(true);
-
-    try {
-      // Format history for Gemini SDK
-      const history = messages.map(m => ({
-        role: m.role,
-        parts: [{ text: m.text }]
-      }));
-
-      const response = await chatWithGemini(text, history);
-      setMessages(prev => [...prev, { role: 'model', text: response || 'No recibí respuesta.' }]);
-    } catch (error) {
-      setMessages(prev => [...prev, { role: 'model', text: 'Ups, algo salió mal. Inténtalo de nuevo.' }]);
-    } finally {
-      setIsLoading(false);
-    }
+  // Selección de categoría desde el menú
+  const handleSelectCategory = (category: Category) => {
+    setMessages(prev => [...prev, { role: 'user', text: category.label }]);
+    setView({ type: 'questions', category });
   };
 
-  const suggestions = [
-    "¿Qué es NINCH?",
-    "¿Cómo conectan marcas y creadores?",
-    "Quiero sumarme como creador",
-    "¿Qué beneficios ofrecen a las marcas?"
-  ];
+  // Selección de una pregunta → muestra la respuesta
+  const handleSelectQuestion = (category: Category, qa: QA) => {
+    setMessages(prev => [
+      ...prev,
+      { role: 'user', text: qa.question },
+      { role: 'model', text: qa.answer },
+    ]);
+    setView({ type: 'answer', category, qa });
+  };
+
+  // Volver al menú principal
+  const handleBackToMenu = () => {
+    setView({ type: 'menu' });
+  };
+
+  // Volver a la lista de preguntas de la categoría actual
+  const handleBackToQuestions = (category: Category) => {
+    setView({ type: 'questions', category });
+  };
 
   return (
     <div className="fixed bottom-6 right-6 z-[100]">
@@ -77,7 +79,7 @@ export const ChatBot = () => {
                   <p className="text-[10px] opacity-80">Online • Soporte Estratégico</p>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={() => setIsOpen(false)}
                 className="p-1 hover:bg-white/10 rounded-full transition-colors"
                 id="close-chat"
@@ -89,13 +91,13 @@ export const ChatBot = () => {
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/50">
               {messages.map((m, i) => (
-                <div 
-                  key={i} 
+                <div
+                  key={i}
                   className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div className={`flex gap-2 max-w-[85%] ${m.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${m.role === 'user' ? 'bg-gray-200' : 'bg-[#0022ff]/10 text-[#0022ff]'}`}>
-                      {m.role === 'user' ? <User size={14} /> : <Bot size={14} />}
+                      {m.role === 'user' ? <span className="text-xs font-bold text-gray-600">Tú</span> : <Bot size={14} />}
                     </div>
                     <div className={`p-3 rounded-2xl text-sm leading-relaxed ${m.role === 'user' ? 'bg-[#0022ff] text-white rounded-tr-none' : 'bg-white border border-gray-100 shadow-sm rounded-tl-none text-gray-800'}`}>
                       {m.text}
@@ -103,62 +105,104 @@ export const ChatBot = () => {
                   </div>
                 </div>
               ))}
-              {isLoading && (
-                <div className="flex justify-start">
-                  <div className="flex gap-2 max-w-[85%] flex-row">
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center bg-[#0022ff]/10 text-[#0022ff]">
-                      <Bot size={14} />
-                    </div>
-                    <div className="p-3 rounded-2xl bg-white border border-gray-100 shadow-sm rounded-tl-none">
-                      <Loader2 size={18} className="animate-spin text-[#0022ff]" />
-                    </div>
-                  </div>
-                </div>
-              )}
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Suggestions */}
-            {messages.length === 1 && !isLoading && (
-              <div className="p-4 pt-0 bg-gray-50/50 overflow-x-auto pb-2">
-                <div className="flex gap-2 min-w-max">
-                  {suggestions.map((s, i) => (
-                    <button
-                      key={i}
-                      onClick={() => handleSend(s)}
-                      className="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:border-[#0022ff] hover:text-[#0022ff] transition-all"
-                      id={`suggestion-${i}`}
+            {/* Navegación por botones */}
+            <div className="p-4 bg-white border-t border-gray-100 max-h-[220px] overflow-y-auto">
+              <AnimatePresence mode="wait">
+                {/* MENÚ PRINCIPAL */}
+                {view.type === 'menu' && (
+                  <motion.div
+                    key="menu"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    className="flex flex-col gap-2"
+                  >
+                    {CATEGORIES.map((cat) => (
+                      <button
+                        key={cat.id}
+                        onClick={() => handleSelectCategory(cat)}
+                        className="flex items-center justify-between w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-700 hover:border-[#0022ff] hover:text-[#0022ff] transition-all text-left"
+                      >
+                        <span>{cat.label}</span>
+                        <ChevronRight size={16} className="opacity-50 flex-shrink-0" />
+                      </button>
+                    ))}
+                    <a
+                      href={`mailto:${CONTACT_EMAIL}`}
+                      className="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-[#0022ff] text-white rounded-xl text-sm font-medium hover:bg-[#0022ff]/90 transition-all"
                     >
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+                      <Mail size={16} />
+                      <span>Otra consulta (escribinos)</span>
+                    </a>
+                  </motion.div>
+                )}
 
-            {/* Input */}
-            <form 
-              onSubmit={(e) => { e.preventDefault(); handleSend(); }}
-              className="p-4 bg-white border-t border-gray-100 flex gap-2"
-            >
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Escribe un mensaje..."
-                className="flex-1 bg-gray-100 border-none rounded-full px-4 py-2 text-sm focus:ring-2 focus:ring-[#0022ff]/20 focus:outline-none"
-                id="chat-input"
-              />
-              <button
-                type="submit"
-                disabled={!input.trim() || isLoading}
-                className="w-10 h-10 bg-[#0022ff] text-white rounded-full flex items-center justify-center hover:bg-[#0022ff]/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md"
-                id="send-button"
-              >
-                <Send size={18} className={isLoading ? 'hidden' : 'block'} />
-                {isLoading && <Loader2 size={18} className="animate-spin" />}
-              </button>
-            </form>
+                {/* LISTA DE PREGUNTAS */}
+                {view.type === 'questions' && (
+                  <motion.div
+                    key="questions"
+                    initial={{ opacity: 0, x: 10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    className="flex flex-col gap-2"
+                  >
+                    <button
+                      onClick={handleBackToMenu}
+                      className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#0022ff] transition-colors mb-1"
+                    >
+                      <ArrowLeft size={14} />
+                      <span>Volver al menú</span>
+                    </button>
+                    {view.category.questions.map((qa, i) => (
+                      <button
+                        key={i}
+                        onClick={() => handleSelectQuestion(view.category, qa)}
+                        className="flex items-center justify-between gap-2 w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-700 hover:border-[#0022ff] hover:text-[#0022ff] transition-all text-left"
+                      >
+                        <span>{qa.question}</span>
+                        <ChevronRight size={16} className="opacity-50 flex-shrink-0" />
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+
+                {/* RESPUESTA MOSTRADA */}
+                {view.type === 'answer' && (
+                  <motion.div
+                    key="answer"
+                    initial={{ opacity: 0, x: 10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    className="flex flex-col gap-2"
+                  >
+                    <button
+                      onClick={() => handleBackToQuestions(view.category)}
+                      className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#0022ff] transition-colors"
+                    >
+                      <ArrowLeft size={14} />
+                      <span>Volver a {view.category.label}</span>
+                    </button>
+                    <button
+                      onClick={handleBackToMenu}
+                      className="flex items-center justify-center gap-1.5 w-full px-4 py-2.5 bg-gray-100 rounded-xl text-sm text-gray-600 hover:bg-gray-200 transition-all"
+                    >
+                      <MessageCircle size={15} />
+                      <span>Menú principal</span>
+                    </button>
+                    <a
+                      href={`mailto:${CONTACT_EMAIL}`}
+                      className="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-[#0022ff] text-white rounded-xl text-sm font-medium hover:bg-[#0022ff]/90 transition-all"
+                    >
+                      <Mail size={16} />
+                      <span>¿Otra consulta? Escribinos</span>
+                    </a>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -192,7 +236,7 @@ export const ChatBot = () => {
             </motion.div>
           )}
         </AnimatePresence>
-        
+
         {/* Subtle badge if closed */}
         {!isOpen && (
           <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full border-2 border-white flex items-center justify-center text-[10px] font-bold text-white shadow-sm">

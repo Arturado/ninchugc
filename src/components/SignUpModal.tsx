@@ -1,11 +1,20 @@
 import { motion, AnimatePresence } from "motion/react";
-import { X, Instagram, Linkedin, Send, Share2 } from "lucide-react";
+import { X, Send, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { useState, FormEvent } from "react";
+
+// === Formspree ===
+// 1. Creá una cuenta gratis en https://formspree.io
+// 2. Creá un form y configurá press@ninchcompany.com como destino
+// 3. Pegá acá el ID que te dan (la parte final de https://formspree.io/f/XXXXXXXX)
+const FORMSPREE_FORM_ID = "TU_FORM_ID_AQUI";
+const FORMSPREE_ENDPOINT = `https://formspree.io/f/${FORMSPREE_FORM_ID}`;
 
 interface SignUpModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
+
+type SubmitStatus = "idle" | "sending" | "success" | "error";
 
 export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
   const [formData, setFormData] = useState({
@@ -18,6 +27,9 @@ export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
     handle: "",
     contentTypes: [] as string[]
   });
+
+  const [status, setStatus] = useState<SubmitStatus>("idle");
+  const [errorMsg, setErrorMsg] = useState("");
 
   const contentOptions = [
     "Beauty", "Lifestyle", "Travel", "Foodie", 
@@ -33,12 +45,58 @@ export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
     }));
   };
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    console.log("Form submitted:", formData);
-    // Here we would typically send the data to a backend
-    alert("¡Gracias por sumarte a STAGE!");
+  const resetAndClose = () => {
+    setFormData({
+      fullName: "", country: "", birthDate: "", gender: "",
+      email: "", phone: "", handle: "", contentTypes: []
+    });
+    setStatus("idle");
+    setErrorMsg("");
     onClose();
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (status === "sending") return;
+
+    // Aviso si todavía no se configuró el ID de Formspree
+    if (FORMSPREE_FORM_ID === "TU_FORM_ID_AQUI") {
+      setStatus("error");
+      setErrorMsg("El formulario aún no está configurado. Falta el ID de Formspree.");
+      return;
+    }
+
+    setStatus("sending");
+    setErrorMsg("");
+
+    try {
+      const response = await fetch(FORMSPREE_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          "Nombre completo": formData.fullName,
+          "País": formData.country,
+          "Fecha de nacimiento": formData.birthDate,
+          "Género": formData.gender,
+          "Email": formData.email,
+          "Teléfono": formData.phone,
+          "Usuario (IG/TikTok)": formData.handle,
+          "Tipo de contenido": formData.contentTypes.join(", "),
+        }),
+      });
+
+      if (response.ok) {
+        setStatus("success");
+      } else {
+        const data = await response.json().catch(() => null);
+        const msg = data?.errors?.map((er: { message: string }) => er.message).join(", ");
+        setStatus("error");
+        setErrorMsg(msg || "No se pudo enviar el formulario. Intentá de nuevo.");
+      }
+    } catch {
+      setStatus("error");
+      setErrorMsg("Error de conexión. Revisá tu internet e intentá de nuevo.");
+    }
   };
 
   return (
@@ -50,7 +108,7 @@ export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
+            onClick={resetAndClose}
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110]"
           />
 
@@ -64,7 +122,7 @@ export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
             >
               {/* Close Button */}
               <button
-                onClick={onClose}
+                onClick={resetAndClose}
                 className="absolute top-4 right-4 z-10 w-10 h-10 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors"
                 id="close-modal"
               >
@@ -73,6 +131,25 @@ export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
 
               {/* Scrollable Content */}
               <div className="flex-1 overflow-y-auto">
+                {status === "success" ? (
+                  /* Pantalla de éxito */
+                  <div className="p-8 md:p-12 flex flex-col items-center justify-center text-center min-h-[400px]">
+                    <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mb-6">
+                      <CheckCircle2 size={48} className="text-green-500" />
+                    </div>
+                    <h3 className="text-2xl font-black text-gray-800 mb-3">¡Gracias por sumarte a STAGE!</h3>
+                    <p className="text-gray-600 text-lg leading-relaxed max-w-md mb-8">
+                      Recibimos tu información. Te contactaremos cuando haya una campaña que se adapte a tu perfil.
+                    </p>
+                    <button
+                      onClick={resetAndClose}
+                      className="px-8 py-4 bg-[#0022ff] text-white font-bold uppercase tracking-wider rounded-2xl shadow-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Cerrar
+                    </button>
+                  </div>
+                ) : (
+                <>
                 {/* Header Image Area */}
                 <div className="relative w-full overflow-hidden">
                   <motion.img 
@@ -213,16 +290,34 @@ export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
                       </div>
                     </div>
 
+                    {/* Mensaje de error */}
+                    {status === "error" && (
+                      <div className="flex items-center gap-2 px-4 py-3 bg-red-50 border border-red-200 rounded-2xl text-sm text-red-700">
+                        <AlertCircle size={18} className="flex-shrink-0" />
+                        <span>{errorMsg}</span>
+                      </div>
+                    )}
+
                     {/* Submit Button */}
                     <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
+                      whileHover={status === "sending" ? {} : { scale: 1.02 }}
+                      whileTap={status === "sending" ? {} : { scale: 0.98 }}
                       type="submit"
-                      className="w-full py-5 bg-[#0022ff] text-white font-black uppercase tracking-widest rounded-2xl shadow-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-3"
+                      disabled={status === "sending"}
+                      className="w-full py-5 bg-[#0022ff] text-white font-black uppercase tracking-widest rounded-2xl shadow-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
                       id="signup-submit"
                     >
-                      <Send size={20} />
-                      SIGN UP
+                      {status === "sending" ? (
+                        <>
+                          <Loader2 size={20} className="animate-spin" />
+                          ENVIANDO...
+                        </>
+                      ) : (
+                        <>
+                          <Send size={20} />
+                          SIGN UP
+                        </>
+                      )}
                     </motion.button>
                   </form>
 
@@ -317,6 +412,8 @@ export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
                     </div>
                   </div>
                 </div>
+                </>
+                )}
               </div>
             </motion.div>
           </div>
