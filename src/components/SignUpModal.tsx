@@ -2,8 +2,11 @@ import { motion, AnimatePresence } from "motion/react";
 import { X, Send, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { useState, FormEvent } from "react";
 
-
-const FORMSPREE_FORM_ID = "xkoelqab";
+// === Formspree ===
+// 1. Creá una cuenta gratis en https://formspree.io
+// 2. Creá un form y configurá press@ninchcompany.com como destino
+// 3. Pegá acá el ID que te dan (la parte final de https://formspree.io/f/XXXXXXXX)
+const FORMSPREE_FORM_ID = "TU_FORM_ID_AQUI";
 const FORMSPREE_ENDPOINT = `https://formspree.io/f/${FORMSPREE_FORM_ID}`;
 
 interface SignUpModalProps {
@@ -57,7 +60,7 @@ export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
     if (status === "sending") return;
 
     // Aviso si todavía no se configuró el ID de Formspree
-    if (FORMSPREE_FORM_ID === "xkoelqab") {
+    if (FORMSPREE_FORM_ID === "TU_FORM_ID_AQUI") {
       setStatus("error");
       setErrorMsg("El formulario aún no está configurado. Falta el ID de Formspree.");
       return;
@@ -152,7 +155,7 @@ export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
                   <motion.img 
                     whileHover={{ scale: 1.01 }}
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                    src="/UGC-Landing-1.jpg" 
+                    src={`${import.meta.env.BASE_URL}UGC-Landing-1.jpg`} 
                     alt="STAGE Creators"
                     className="w-full h-auto object-cover block cursor-pointer"
                     referrerPolicy="no-referrer"
@@ -332,11 +335,11 @@ export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
                         <div 
                           className="w-7 h-7 bg-[#0022ff] transition-colors"
                           style={{
-                            maskImage: 'url(/INSTAGRAM.svg)',
+                            maskImage: `url(${import.meta.env.BASE_URL}INSTAGRAM.svg)`,
                             maskRepeat: 'no-repeat',
                             maskPosition: 'center',
                             maskSize: 'contain',
-                            WebkitMaskImage: 'url(/INSTAGRAM.svg)',
+                            WebkitMaskImage: `url(${import.meta.env.BASE_URL}INSTAGRAM.svg)`,
                             WebkitMaskRepeat: 'no-repeat',
                             WebkitMaskPosition: 'center',
                             WebkitMaskSize: 'contain'
@@ -353,11 +356,11 @@ export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
                         <div 
                           className="w-7 h-7 bg-[#0022ff] transition-colors"
                           style={{
-                            maskImage: 'url(/LINKEDIN.svg)',
+                            maskImage: `url(${import.meta.env.BASE_URL}LINKEDIN.svg)`,
                             maskRepeat: 'no-repeat',
                             maskPosition: 'center',
                             maskSize: 'contain',
-                            WebkitMaskImage: 'url(/LINKEDIN.svg)',
+                            WebkitMaskImage: `url(${import.meta.env.BASE_URL}LINKEDIN.svg)`,
                             WebkitMaskRepeat: 'no-repeat',
                             WebkitMaskPosition: 'center',
                             WebkitMaskSize: 'contain'
@@ -374,11 +377,11 @@ export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
                         <div 
                           className="w-7 h-7 bg-[#0022ff] transition-colors"
                           style={{
-                            maskImage: 'url(/YOUTUBE.svg)',
+                            maskImage: `url(${import.meta.env.BASE_URL}YOUTUBE.svg)`,
                             maskRepeat: 'no-repeat',
                             maskPosition: 'center',
                             maskSize: 'contain',
-                            WebkitMaskImage: 'url(/YOUTUBE.svg)',
+                            WebkitMaskImage: `url(${import.meta.env.BASE_URL}YOUTUBE.svg)`,
                             WebkitMaskRepeat: 'no-repeat',
                             WebkitMaskPosition: 'center',
                             WebkitMaskSize: 'contain'
@@ -395,11 +398,11 @@ export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
                         <div 
                           className="w-7 h-7 bg-[#0022ff] transition-colors"
                           style={{
-                            maskImage: 'url(/BEHANCE.svg)',
+                            maskImage: `url(${import.meta.env.BASE_URL}BEHANCE.svg)`,
                             maskRepeat: 'no-repeat',
                             maskPosition: 'center',
                             maskSize: 'contain',
-                            WebkitMaskImage: 'url(/BEHANCE.svg)',
+                            WebkitMaskImage: `url(${import.meta.env.BASE_URL}BEHANCE.svg)`,
                             WebkitMaskRepeat: 'no-repeat',
                             WebkitMaskPosition: 'center',
                             WebkitMaskSize: 'contain'

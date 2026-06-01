@@ -32,6 +32,9 @@ const BackgroundVideo = () => {
         setIsReady(true);
       } catch (err) {
         console.warn("Autoplay blocked, waiting for interaction");
+        // Aunque el autoplay se bloquee, mostramos el video (frame congelado)
+        // para no dejar la pantalla en negro hasta el primer click.
+        setIsReady(true);
       }
     };
 
@@ -68,7 +71,7 @@ const BackgroundVideo = () => {
         preload="auto"
         onLoadedData={() => setIsReady(true)}
         className={`w-full h-full object-cover contrast-110 transition-opacity duration-1000 ${isReady ? 'opacity-100' : 'opacity-0'}`}
-        src="/hf_20260514_204915_7a5662f9-a1d4-408f-bb6d-699aaec0ce8e.mp4"
+        src={`${import.meta.env.BASE_URL}hf_20260514_204915_7a5662f9-a1d4-408f-bb6d-699aaec0ce8e.mp4`}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
     </div>
@@ -155,7 +158,7 @@ export default function App() {
           className="cursor-pointer"
         >
           <img 
-            src="/UGC-Landing-NINCH_Logo-1.svg" 
+            src={`${import.meta.env.BASE_URL}UGC-Landing-NINCH_Logo-1.svg`} 
             alt="NINCH Logo" 
             className="h-[23px] md:h-8 w-auto brightness-0 invert"
             referrerPolicy="no-referrer"
@@ -188,7 +191,7 @@ export default function App() {
           }}
         >
           <img 
-            src="/FLOR_blanca-con_lineas.png" 
+            src={`${import.meta.env.BASE_URL}FLOR_blanca-con_lineas.png`} 
             alt="STAGE 3D Hub Background" 
             className="w-full h-auto drop-shadow-2xl select-none"
             referrerPolicy="no-referrer"
@@ -219,7 +222,7 @@ export default function App() {
           }}
         >
           <img 
-            src="/FLOR_blanca-con_lineas.png" 
+            src={`${import.meta.env.BASE_URL}FLOR_blanca-con_lineas.png`} 
             alt="STAGE 3D Hub Highlight" 
             className="w-full h-auto drop-shadow-[0_20px_50px_rgba(0,34,255,0.3)] select-none"
             referrerPolicy="no-referrer"
@@ -308,6 +311,7 @@ export default function App() {
 
               <motion.button 
                 onMouseEnter={playHoverSound}
+                onClick={() => { window.location.href = "mailto:newbusiness@ninchcompany.com"; }}
                 initial="rest"
                 whileHover="hover"
                 whileTap="tap"

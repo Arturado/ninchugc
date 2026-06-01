@@ -5,6 +5,9 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
+    // Ruta base donde vive la landing en producción (subdirectorio del dominio).
+    // Si mañana cambia la URL pública, actualizá esto y recompilá.
+    base: '/UGC_Landing/',
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
