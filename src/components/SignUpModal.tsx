@@ -6,7 +6,7 @@ import { useState, FormEvent } from "react";
 // 1. Creá una cuenta gratis en https://formspree.io
 // 2. Creá un form y configurá press@ninchcompany.com como destino
 // 3. Pegá acá el ID que te dan (la parte final de https://formspree.io/f/XXXXXXXX)
-const FORMSPREE_FORM_ID = "TU_FORM_ID_AQUI";
+const FORMSPREE_FORM_ID = "xkoelqab";
 const FORMSPREE_ENDPOINT = `https://formspree.io/f/${FORMSPREE_FORM_ID}`;
 
 interface SignUpModalProps {
