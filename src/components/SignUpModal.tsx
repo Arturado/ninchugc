@@ -8,7 +8,7 @@ import { useState, FormEvent } from "react";
 // 3. Implementar → Nueva implementación → Tipo: Aplicación web.
 //    Ejecutar como: Tú | Acceso: Cualquier usuario.
 // 4. Copiamos la URL que termina en /exec y pegala acá abajo.
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzXk7R_ZxIdt46JHzzJ4g7dXczzN5bAAC2nrBBEnnuhZ3vmO42l3nlDaqa2iMKVjpU-/exec"
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx2F5BICLKJYac4hO9GEX8roPubaRrG6v-RqBpJRKwwdA06Serhcbe0J4iymO99fGg/exec"
 interface SignUpModalProps {
   isOpen: boolean;
   onClose: () => void;
