@@ -7,7 +7,7 @@
 
 @layer base {
   body {
-    @apply bg-[#E8E8E8] text-[#141414] antialiased overflow-x-hidden transition-colors duration-500 cursor-none;
+    @apply bg-[#E8E8E8] text-[#141414] antialiased overflow-x-hidden transition-colors duration-500;
     font-family: var(--font-sans);
     letter-spacing: -0.05em;
   }

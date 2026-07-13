@@ -9,7 +9,6 @@ import { useEffect, useState, useRef } from "react";
 import { ChatBot } from "./components/ChatBot";
 import { SignUpModal } from "./components/SignUpModal";
 import { BrandModal } from "./components/BrandModal";
-import CustomCursor from "./components/CustomCursor";
 
 // Audio URLs (Royalty Free)
 const HOVER_SOUND_URL = "https://www.soundjay.com/buttons/sounds/button-16.mp3"; 
@@ -131,9 +130,8 @@ export default function App() {
 
   return (
     <div 
-      className="relative h-screen w-full bg-black overflow-hidden selection:bg-[#0022ff] selection:text-white font-sans flex flex-col cursor-none"
+      className="relative h-screen w-full bg-black overflow-hidden selection:bg-[#0022ff] selection:text-white font-sans flex flex-col"
     >
-      <CustomCursor />
       
       <div className="absolute inset-0 z-0">
         <BackgroundVideo />
@@ -280,7 +278,7 @@ export default function App() {
               transition={{ delay: 1.2 }}
               className="text-center group"
             >
-              <h3 className="text-3xl lg:text-4xl font-black text-white group-hover:scale-105 transition-transform text-white">¿Querés ser parte?</h3>
+              <h3 className="text-3xl lg:text-4xl font-black text-white group-hover:scale-105 transition-transform text-white">¿Quieres ser parte?</h3>
               <p className="text-[30px] lg:text-[50px] font-black uppercase text-white leading-none heading-druk">BE ON</p>
             </motion.div>
 
@@ -336,6 +334,27 @@ export default function App() {
                 </motion.div>
                 <span className="font-normal uppercase">Soy marca</span>
               </motion.button>
+            </div>
+
+            {/* Check our work */}
+            <div className="flex justify-center mt-4">
+              <motion.a
+                onMouseEnter={playHoverSound}
+                href="https://www.youtube.com/playlist?list=PLD9efuj-9naU&si=hFU17SqOpt9144O9"
+                target="_blank"
+                rel="noreferrer"
+                initial="rest"
+                whileHover="hover"
+                whileTap="tap"
+                variants={{
+                  rest: { backgroundColor: "transparent", color: "#ffffff" },
+                  hover: { backgroundColor: "#ffffff", color: "#0022ff", scale: 1.05 },
+                  tap: { scale: 0.95 }
+                }}
+                className="flex items-center justify-center text-xs h-[46px] px-10 rounded-full border-2 border-white uppercase font-normal tracking-wider cursor-pointer"
+              >
+                Check our work
+              </motion.a>
             </div>
           </div>
         </div>
