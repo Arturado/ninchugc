@@ -4,7 +4,7 @@ import { useState, FormEvent } from "react";
 
 // Misma URL de Apps Script que el form de creadores.
 // El script enruta a la pestaña "Marcas" según el campo formType.
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzXk7R_ZxIdt46JHzzJ4g7dXczzN5bAAC2nrBBEnnuhZ3vmO42l3nlDaqa2iMKVjpU-/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx2F5BICLKJYac4hO9GEX8roPubaRrG6v-RqBpJRKwwdA06Serhcbe0J4iymO99fGg/exec";
 
 interface BrandModalProps {
   isOpen: boolean;
