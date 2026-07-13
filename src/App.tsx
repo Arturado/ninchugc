@@ -8,6 +8,7 @@ import { ArrowRight, Globe } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { ChatBot } from "./components/ChatBot";
 import { SignUpModal } from "./components/SignUpModal";
+import { BrandModal } from "./components/BrandModal";
 import CustomCursor from "./components/CustomCursor";
 
 // Audio URLs (Royalty Free)
@@ -92,6 +93,7 @@ export default function App() {
   const rotatedCursor = useSpring(cursorRotation, { stiffness: 200, damping: 30 });
 
   const [isSignUpOpen, setIsSignUpOpen] = useState(false);
+  const [isBrandOpen, setIsBrandOpen] = useState(false);
 
   // Efectos de inclinación y movimiento para la "flor" 3D
   const flowerRotateX = useSpring(useTransform(mouseY, [0, 1000], [10, -10]), springConfig);
@@ -306,12 +308,12 @@ export default function App() {
                 >
                   <ArrowRight className="w-5 h-5" />
                 </motion.div>
-                <span className="font-normal uppercase">SI SOS CREATOR</span>
+                <span className="font-normal uppercase">Soy creador</span>
               </motion.button>
 
               <motion.button 
                 onMouseEnter={playHoverSound}
-                onClick={() => { window.location.href = "mailto:newbusiness@ninchcompany.com"; }}
+                onClick={() => setIsBrandOpen(true)}
                 initial="rest"
                 whileHover="hover"
                 whileTap="tap"
@@ -332,7 +334,7 @@ export default function App() {
                 >
                   <ArrowRight className="w-5 h-5" />
                 </motion.div>
-                <span className="font-normal uppercase">SI SOS MARCA</span>
+                <span className="font-normal uppercase">Soy marca</span>
               </motion.button>
             </div>
           </div>
@@ -342,6 +344,11 @@ export default function App() {
       <SignUpModal 
         isOpen={isSignUpOpen} 
         onClose={() => setIsSignUpOpen(false)} 
+      />
+
+      <BrandModal
+        isOpen={isBrandOpen}
+        onClose={() => setIsBrandOpen(false)}
       />
 
       {/* Background Ambience Layers */}

@@ -2,53 +2,40 @@ import { motion, AnimatePresence } from "motion/react";
 import { X, Send, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { useState, FormEvent } from "react";
 
-// === Google Apps Script (formulario → Google Sheets) ===
-// 1. Creá una hoja en Google Sheets.
-// 2. Extensiones → Apps Script, pegá el script que te pasamos.
-// 3. Implementar → Nueva implementación → Tipo: Aplicación web.
-//    Ejecutar como: Tú | Acceso: Cualquier usuario.
-// 4. Copiamos la URL que termina en /exec y pegala acá abajo.
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzXk7R_ZxIdt46JHzzJ4g7dXczzN5bAAC2nrBBEnnuhZ3vmO42l3nlDaqa2iMKVjpU-/exec"
-interface SignUpModalProps {
+// Misma URL de Apps Script que el form de creadores.
+// El script enruta a la pestaña "Marcas" según el campo formType.
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzXk7R_ZxIdt46JHzzJ4g7dXczzN5bAAC2nrBBEnnuhZ3vmO42l3nlDaqa2iMKVjpU-/exec";
+
+interface BrandModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
 type SubmitStatus = "idle" | "sending" | "success" | "error";
 
-export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
+export const BrandModal = ({ isOpen, onClose }: BrandModalProps) => {
   const [formData, setFormData] = useState({
     fullName: "",
     country: "",
-    birthDate: "",
-    gender: "",
+    company: "",
+    role: "",
+    serviceType: "",
     email: "",
     phone: "",
-    handle: "",
-    contentTypes: [] as string[]
   });
 
   const [status, setStatus] = useState<SubmitStatus>("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
-  const contentOptions = [
-    "Beauty", "Lifestyle", "Travel", "Foodie", 
-    "Tecnología", "Gaming", "Finanzas", "Hogar/Decoración", "Otro"
+  const serviceOptions = [
+    "Creación de contenido para mis redes.",
+    "Creación de contenido + amplificación en redes del creador.",
   ];
-
-  const handleContentTypeToggle = (option: string) => {
-    setFormData(prev => ({
-      ...prev,
-      contentTypes: prev.contentTypes.includes(option)
-        ? prev.contentTypes.filter(item => item !== option)
-        : [...prev.contentTypes, option]
-    }));
-  };
 
   const resetAndClose = () => {
     setFormData({
-      fullName: "", country: "", birthDate: "", gender: "",
-      email: "", phone: "", handle: "", contentTypes: []
+      fullName: "", country: "", company: "", role: "",
+      serviceType: "", email: "", phone: "",
     });
     setStatus("idle");
     setErrorMsg("");
@@ -59,27 +46,31 @@ export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
     e.preventDefault();
     if (status === "sending") return;
 
+    if (!formData.serviceType) {
+      setStatus("error");
+      setErrorMsg("Seleccioná un tipo de servicio.");
+      return;
+    }
+
     setStatus("sending");
     setErrorMsg("");
 
     try {
       // Apps Script no devuelve headers CORS, por eso usamos no-cors.
-      // La respuesta queda "opaca" (no se puede leer), pero el dato sí se
-      // escribe en la hoja. Asumimos éxito si el fetch no lanza error de red.
+      // formType: "marca" le dice al script que escriba en la pestaña Marcas.
       await fetch(APPS_SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({
-          formType: "creador",
+          formType: "marca",
           fullName: formData.fullName,
           country: formData.country,
-          birthDate: formData.birthDate,
-          gender: formData.gender,
+          company: formData.company,
+          role: formData.role,
+          serviceType: formData.serviceType,
           email: formData.email,
           phone: formData.phone,
-          handle: formData.handle,
-          contentTypes: formData.contentTypes.join(", "),
         }),
       });
       setStatus("success");
@@ -114,7 +105,7 @@ export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
               <button
                 onClick={resetAndClose}
                 className="absolute top-4 right-4 z-10 w-10 h-10 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors"
-                id="close-modal"
+                id="close-brand-modal"
               >
                 <X size={24} />
               </button>
@@ -127,9 +118,9 @@ export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
                     <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mb-6">
                       <CheckCircle2 size={48} className="text-green-500" />
                     </div>
-                    <h3 className="text-2xl font-black text-gray-800 mb-3">¡Gracias por sumarte a STAGE!</h3>
+                    <h3 className="text-2xl font-black text-gray-800 mb-3">¡Gracias por tu interés en STAGE!</h3>
                     <p className="text-gray-600 text-lg leading-relaxed max-w-md mb-8">
-                      Recibimos tu información. Te contactaremos cuando haya una campaña que se adapte a tu perfil.
+                      Recibimos tu información. Nuestro equipo se pondrá en contacto para contarte cómo amplificar tu contenido.
                     </p>
                     <button
                       onClick={resetAndClose}
@@ -142,11 +133,11 @@ export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
                 <>
                 {/* Header Image Area */}
                 <div className="relative w-full overflow-hidden">
-                  <motion.img 
+                  <motion.img
                     whileHover={{ scale: 1.01 }}
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                    src={`${import.meta.env.BASE_URL}UGC-Landing-1.jpg`} 
-                    alt="STAGE Creators"
+                    src={`${import.meta.env.BASE_URL}UGC-Landing-1.jpg`}
+                    alt="STAGE Brands"
                     className="w-full h-auto object-cover block cursor-pointer"
                     referrerPolicy="no-referrer"
                   />
@@ -156,7 +147,7 @@ export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
                   {/* Welcome Message */}
                   <div className="mb-10 text-center">
                     <p className="text-gray-600 text-lg leading-relaxed">
-                      El espacio que te conecta con las top brands de LATAM para que seas el protagonista. 
+                      La plataforma que te conecta con los top UGC & creadores de LATAM para amplificar tu contenido.
                       Completa nuestro form para estar al día con nuestras últimas campañas UGC.
                     </p>
                   </div>
@@ -190,33 +181,30 @@ export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
                         />
                       </div>
 
-                      {/* Birth Date */}
+                      {/* Company */}
                       <div className="space-y-2">
-                        <label className="text-sm font-bold uppercase tracking-wider text-gray-500">Fecha de nacimiento</label>
+                        <label className="text-sm font-bold uppercase tracking-wider text-gray-500">Empresa</label>
                         <input
                           required
-                          type="date"
+                          type="text"
+                          placeholder="Nombre de tu empresa"
                           className="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-[#0022ff] focus:outline-none transition-colors"
-                          value={formData.birthDate}
-                          onChange={e => setFormData({ ...formData, birthDate: e.target.value })}
+                          value={formData.company}
+                          onChange={e => setFormData({ ...formData, company: e.target.value })}
                         />
                       </div>
 
-                      {/* Gender */}
+                      {/* Role */}
                       <div className="space-y-2">
-                        <label className="text-sm font-bold uppercase tracking-wider text-gray-500">Género</label>
-                        <select
+                        <label className="text-sm font-bold uppercase tracking-wider text-gray-500">Rol</label>
+                        <input
                           required
-                          className="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-[#0022ff] focus:outline-none transition-colors appearance-none"
-                          value={formData.gender}
-                          onChange={e => setFormData({ ...formData, gender: e.target.value })}
-                        >
-                          <option value="">Seleccionar...</option>
-                          <option value="femenino">Femenino</option>
-                          <option value="masculino">Masculino</option>
-                          <option value="no binario">No Binario</option>
-                          <option value="prefiero no decirlo">Prefiero no decirlo</option>
-                        </select>
+                          type="text"
+                          placeholder="Ej: Marketing Manager..."
+                          className="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-[#0022ff] focus:outline-none transition-colors"
+                          value={formData.role}
+                          onChange={e => setFormData({ ...formData, role: e.target.value })}
+                        />
                       </div>
 
                       {/* Email */}
@@ -245,32 +233,19 @@ export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
                         />
                       </div>
 
-                      {/* Username */}
-                      <div className="space-y-2 md:col-span-2">
-                        <label className="text-sm font-bold uppercase tracking-wider text-gray-500">Usuario (Instagram o TikTok)</label>
-                        <input
-                          required
-                          type="text"
-                          placeholder="@tu_usuario"
-                          className="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-[#0022ff] focus:outline-none transition-colors"
-                          value={formData.handle}
-                          onChange={e => setFormData({ ...formData, handle: e.target.value })}
-                        />
-                      </div>
-
-                      {/* Content Type (Multi-select) */}
+                      {/* Service Type (Single select via buttons) */}
                       <div className="space-y-4 md:col-span-2">
-                        <label className="text-sm font-bold uppercase tracking-wider text-gray-500 block">Tipo de contenido (Selecciona una o más)</label>
-                        <div className="flex flex-wrap gap-2">
-                          {contentOptions.map(option => (
+                        <label className="text-sm font-bold uppercase tracking-wider text-gray-500 block">Tipo de servicio</label>
+                        <div className="flex flex-col gap-3">
+                          {serviceOptions.map(option => (
                             <button
                               key={option}
                               type="button"
-                              onClick={() => handleContentTypeToggle(option)}
-                              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                                formData.contentTypes.includes(option)
-                                  ? "bg-[#0022ff] text-white shadow-lg"
-                                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                              onClick={() => setFormData({ ...formData, serviceType: option })}
+                              className={`px-5 py-4 rounded-2xl text-sm font-medium text-left transition-all border-2 ${
+                                formData.serviceType === option
+                                  ? "bg-[#0022ff] text-white border-[#0022ff] shadow-lg"
+                                  : "bg-gray-50 text-gray-600 border-gray-100 hover:bg-gray-100"
                               }`}
                             >
                               {option}
@@ -295,7 +270,7 @@ export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
                       type="submit"
                       disabled={status === "sending"}
                       className="w-full py-5 bg-[#0022ff] text-white font-black uppercase tracking-widest rounded-2xl shadow-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
-                      id="signup-submit"
+                      id="brand-submit"
                     >
                       {status === "sending" ? (
                         <>
@@ -305,7 +280,7 @@ export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
                       ) : (
                         <>
                           <Send size={20} />
-                          SIGN UP
+                          ENVIAR
                         </>
                       )}
                     </motion.button>
@@ -315,14 +290,14 @@ export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
                   <div className="mt-16 pt-10 border-t border-gray-100 text-center">
                     <p className="text-gray-500 font-bold uppercase tracking-wider mb-6">¿Querés conocer más sobre NINCH?</p>
                     <div className="flex justify-center flex-wrap gap-2.5">
-                      <motion.a 
+                      <motion.a
                         whileHover={{ y: -5, scale: 1.1 }}
-                        href="https://www.instagram.com/ninchcompany/" 
-                        target="_blank" 
+                        href="https://www.instagram.com/ninchcompany/"
+                        target="_blank"
                         rel="noreferrer"
                         className="group"
                       >
-                        <div 
+                        <div
                           className="w-7 h-7 bg-[#0022ff] transition-colors"
                           style={{
                             maskImage: `url(${import.meta.env.BASE_URL}INSTAGRAM.svg)`,
@@ -336,14 +311,14 @@ export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
                           }}
                         />
                       </motion.a>
-                      <motion.a 
+                      <motion.a
                         whileHover={{ y: -5, scale: 1.1 }}
-                        href="https://www.linkedin.com/company/ninch-comunicacion-estrategica/" 
-                        target="_blank" 
+                        href="https://www.linkedin.com/company/ninch-comunicacion-estrategica/"
+                        target="_blank"
                         rel="noreferrer"
                         className="group"
                       >
-                        <div 
+                        <div
                           className="w-7 h-7 bg-[#0022ff] transition-colors"
                           style={{
                             maskImage: `url(${import.meta.env.BASE_URL}LINKEDIN.svg)`,
@@ -357,14 +332,14 @@ export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
                           }}
                         />
                       </motion.a>
-                      <motion.a 
+                      <motion.a
                         whileHover={{ y: -5, scale: 1.1 }}
-                        href="https://www.youtube.com/@NinchCompany" 
-                        target="_blank" 
+                        href="https://www.youtube.com/@NinchCompany"
+                        target="_blank"
                         rel="noreferrer"
                         className="group"
                       >
-                        <div 
+                        <div
                           className="w-7 h-7 bg-[#0022ff] transition-colors"
                           style={{
                             maskImage: `url(${import.meta.env.BASE_URL}YOUTUBE.svg)`,
@@ -378,14 +353,14 @@ export const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
                           }}
                         />
                       </motion.a>
-                      <motion.a 
+                      <motion.a
                         whileHover={{ y: -5, scale: 1.1 }}
-                        href="https://www.behance.net/ninchcompany" 
-                        target="_blank" 
+                        href="https://www.behance.net/ninchcompany"
+                        target="_blank"
                         rel="noreferrer"
                         className="group"
                       >
-                        <div 
+                        <div
                           className="w-7 h-7 bg-[#0022ff] transition-colors"
                           style={{
                             maskImage: `url(${import.meta.env.BASE_URL}BEHANCE.svg)`,
