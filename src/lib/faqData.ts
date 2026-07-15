@@ -1,35 +1,27 @@
-// Contenido del chatbot NINCH STAGE (UGC).
-// Estructura: categorías → preguntas → respuestas fijas (sin IA).
-// El email de contacto se usa para la opción "Otra consulta".
+// =====================================================================
+// NINCH STAGE — FAQ ("Tengo otras consultas")
+// Se accede al final del cuestionario del chatbot.
+// Fuente: Cuestionario_Otras_consultas_UGC_STAGE.docx
+// =====================================================================
 
-export const CONTACT_EMAIL = "newbusiness@ninchcompany.com";
+export const FAQ_CONTACT_EMAIL = "newbusiness@ninchcompany.com";
 
-export interface QA {
+export interface FaqQA {
   question: string;
   answer: string;
 }
 
-export interface Category {
+export interface FaqCategory {
   id: string;
   label: string;
-  questions: QA[];
+  questions: FaqQA[];
 }
 
-export const CATEGORIES: Category[] = [
+export const FAQ_CATEGORIES: FaqCategory[] = [
   {
     id: "general",
     label: "Información general",
     questions: [
-      {
-        question: "¿Quién es NINCH?",
-        answer:
-          "NINCH® Creative Communication Company es una compañía de comunicación integral que acompaña a top brands en Latinoamérica a generar relevancia cultural real, combinando estrategia, creatividad y ejecución para acompañarlas en su evolución con una mirada regional, joven y desafiante.",
-      },
-      {
-        question: "¿Qué es STAGE?",
-        answer:
-          "NINCH Stage es la plataforma de UGC de NINCH que conecta top brands con creadores para transformar contenido auténtico en conversación cultural, combinando estrategia y creatividad.",
-      },
       {
         question: "¿En qué países opera STAGE?",
         answer:
@@ -49,7 +41,7 @@ export const CATEGORIES: Category[] = [
       {
         question: "¿Cuántos seguidores tengo que tener para suscribirme como creador?",
         answer:
-          "En STAGE no ponemos un mínimo de seguidores como requisito. Lo que evaluamos es la calidad de tu contenido: tu forma de narrar, tu manejo de cámara, tu estética, tu autenticidad. Si generás contenido que genera conexión, eso es lo que nos interesa.",
+          "En STAGE no ponemos un mínimo de seguidores como requisito. Lo que evaluamos es la calidad de tu contenido: tu forma de narrar, tu manejo de cámara, tu estética, tu autenticidad. Si generas contenido que genera conexión, eso es lo que nos interesa.",
       },
       {
         question: "¿Cómo me entero de las campañas que hay disponibles para participar?",
@@ -67,19 +59,19 @@ export const CATEGORIES: Category[] = [
           "El modelo de contratación es mediante factura. Al cerrar tu participación en una campaña, acordamos los términos y el creador emite la factura correspondiente al trabajo.",
       },
       {
-        question: "¿Puedo participar en campañas en más de un país?",
+        question: "¿Puedo participar para campañas en más de un país?",
         answer:
           "Sí, siempre que se cumplan los requisitos de la campaña. Si la campaña requiere presencia física en un país determinado, vas a necesitar estar ahí en el momento de la producción. Si la campaña no requiere presencialidad, podés participar desde donde estés. En todos los casos, te informaremos claramente qué se necesita antes de confirmar tu participación.",
       },
       {
         question: "¿Tengo que seguir un guión de la marca o el contenido lo propongo yo?",
         answer:
-          "El contenido se construye en co-creación. La marca trae su identidad, objetivos y puntos clave a comunicar; vos traés tu estilo, tu autenticidad y tu visión. Desde NINCH coordinamos ese proceso para que el resultado sea el mensaje de la marca, pero que suene genuino y natural en tu propio estilo.",
+          "El contenido se construye en co-creación. La marca trae su identidad, objetivos y puntos clave a comunicar; vos traés tu estilo, tu autenticidad y tu visión. Desde NINCH coordinamos ese proceso para que el resultado sea el mensaje de la marca pero que suene genuino y natural en tu propio estilo.",
       },
       {
         question: "¿En qué redes se publicará el contenido?",
         answer:
-          "Depende de cada campaña. El contenido podrá publicarse tanto en tus redes sociales (Instagram, TikTok, YouTube) como en los canales propios de la marca — sus redes, web, newsletters o anuncios pagos — o en ambos a la vez. Depende de la estrategia de cada campaña y se comunicará antes de producir el contenido.",
+          "Depende de cada campaña. El contenido podrá ser para publicar tanto en tus redes sociales (Instagram, TikTok, YouTube) como en los canales propios de la marca — como sus redes, web, newsletters o anuncios pagos — o en ambos a la vez. Depende de la estrategia de cada campaña. Se comunicará antes de producir el contenido.",
       },
       {
         question: "¿Por qué anotarme en STAGE?",
@@ -95,6 +87,11 @@ export const CATEGORIES: Category[] = [
         question: "¿Tengo que comprar yo los productos que voy a mostrar?",
         answer:
           "En la mayoría de los casos, la marca proveerá los productos necesarios para la producción del contenido. En caso de que haya alguna particularidad, te lo informaremos.",
+      },
+      {
+        question: "¿Por cuánto tiempo podrá ser utilizado el contenido que cree para la marca?",
+        answer:
+          "El plazo y las condiciones de uso del contenido se definirán previamente para cada campaña y serán comunicados antes de tu participación. En caso de que la marca quiera extender o modificar ese uso una vez finalizada la campaña, deberá informarlo a NINCH para que podamos gestionar una nueva negociación y acordar las condiciones correspondientes con el creador.",
       },
     ],
   },
@@ -120,7 +117,7 @@ export const CATEGORIES: Category[] = [
       {
         question: "¿Yo le tengo que decir al creador lo que tiene que publicar?",
         answer:
-          "En STAGE trabajamos con un modelo de co-creación entre la marca, el creador y nuestro equipo de NINCH. Mientras la marca define sus objetivos y mensajes clave, el creador aporta su estilo y autenticidad, y nosotros coordinamos el proceso creativo para que el resultado sea contenido que funcione estratégicamente y sea genuino.",
+          "En STAGE trabajamos con un modelo de co-creación entre la marca, el creador y nuestro equipo de NINCH. Mientras la marca define sus objetivos y mensajes clave; el creador aporta su estilo y autenticidad; y nosotros coordinamos el proceso creativo para que el resultado sea contenido que funcione estratégicamente y sea genuino.",
       },
       {
         question: "¿Cómo sé si el contenido se va a ajustar a lo que necesito?",
@@ -135,7 +132,7 @@ export const CATEGORIES: Category[] = [
       {
         question: "¿Cuál es la inversión para una campaña de UGC?",
         answer:
-          "La inversión depende de cada caso: la cantidad de creadores, el tipo de contenido y la duración de la campaña, entre otras cosas. El objetivo es que la campaña responda 100% a las necesidades de la marca. Para tener un presupuesto customizado te recomendamos contactarnos a través de newbusiness@ninchcompany.com.",
+          "La inversión depende de cada caso: la cantidad de creadores, el tipo de contenido y la duración de la campaña, entre otras cosas. El objetivo es que la campaña responda 100% a las necesidades de la marca. Para tener un presupuesto customizado te recomendamos contactarnos a través de newbusiness@ninchcompany.com",
       },
       {
         question: "¿Esta campaña me va a ayudar a tener más ventas?",
@@ -150,7 +147,12 @@ export const CATEGORIES: Category[] = [
       {
         question: "¿Puedo hacer una campaña con STAGE si no soy cliente actual de NINCH?",
         answer:
-          "¡Claro! NINCH ofrece distintas modalidades de contratación que permiten sumarte como cliente anual a través de una iguala o fee mensual, o contratarnos para un proyecto puntual. En cualquier caso, podés contactarte con newbusiness@ninchcompany.com para evaluar tu caso concreto.",
+          "¡Claro! NINCH ofrece distintas modalidades de contratación que permiten sumarte como cliente anual a través de una iguala o fee mensual, o contratarnos para un proyecto puntual. En cualquier caso, te puedes contactar con newbusiness@ninchcompany.com para evaluar tu caso concreto.",
+      },
+      {
+        question: "¿Qué sucede si quiero utilizar el contenido del creador fuera de la campaña?",
+        answer:
+          "Los plazos y condiciones de uso del contenido se acuerdan previamente para cada campaña. Si posteriormente quieres utilizar el contenido por fuera de los términos originalmente pactados, te pedimos que nos lo informes para que podamos coordinarlo con el creador y gestionar las condiciones correspondientes para ese nuevo uso.",
       },
     ],
   },
